@@ -59,6 +59,10 @@ npm run dev
 
 してください。
 
+なのでNetlifyのコマンドは  
+`npm run download && npm run generate`  
+になっている。
+
 ## 二回目以降（CSVデータの更新が必要ない場合）
 ```
 npm run dev
