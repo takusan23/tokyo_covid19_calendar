@@ -2,7 +2,7 @@
 <template>
   <div>
     <v-card class="pa-3 ma-3" elevation="10">
-      <h1>{{formatStartTime}}</h1>
+      <p style="font-size:30px">{{formatStartTime}}</p>
       <v-calendar
         ref="calendar"
         :event-color="getEventColor"
@@ -55,9 +55,9 @@ export default Vue.extend({
     this.setCalendarDate();
 
     // 日付と感染者数のMap
-    const dayCountMap = new Map<String, number>();
+    const dayCountMap = new Map<string, number>();
     // Vuex Storeから取り出す
-    const csvData = this.$store.state.csvData;
+    const csvData = this.$store.state.csvData.body as any[];
     // 一日ごと
     csvData.forEach((item) => {
       // 一個ずつ見ていく
@@ -65,7 +65,7 @@ export default Vue.extend({
       const date = item.公表_年月日;
       if (dayCountMap.has(date)) {
         // キーが有る場合はカウントを増やす
-        dayCountMap.set(date, dayCountMap.get(date) + 1);
+        dayCountMap.set(date, dayCountMap.get(date)!! + 1);
       } else {
         // 無いので作成
         dayCountMap.set(date, 1);
@@ -95,7 +95,7 @@ export default Vue.extend({
       // すでにある場合は
       if (weekCountMap.has(calcWeek)) {
         // キーが有る場合はカウントを増やす
-        const event = weekCountMap.get(calcWeek);
+        const event = weekCountMap.get(calcWeek)!!;
         const data: EventObject = {
           name: `${event.count + item.count} 人`,
           count: event.count + item.count,
@@ -138,9 +138,11 @@ export default Vue.extend({
     },
     // カレンダーの月を設定する
     setCalendarDate() {
-      const month = this.$route.params.month;
-      const year = this.$route.params.year;
-      if (year !== undefined && month !== undefined) {
+      const paramMonth = this.$route.params.month;
+      const paramYear = this.$route.params.year;
+      if (paramMonth !== undefined && paramYear !== undefined) {
+        const month = parseInt(paramMonth);
+        const year = parseInt(paramYear);
         this.start = `${year}-${month}-00`;
         this.formatStartTime = `${year}年${month}月`;
         this.month = month - 1;

@@ -9,7 +9,7 @@
           v-model="$vuetify.theme.dark"
           label="テーマ切り替え"
         ></v-switch>
-        <v-list-item v-for="(item, i) in items" :key="i" :to="item.path" router exact>
+        <v-list-item v-for="(item, i) in items" :key="i" :to="item.path" nuxt router exact>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -45,6 +45,7 @@ interface MenuObject {
 }
 
 export default Vue.extend({
+  // CSVデータを読み込む。asyncDataはlayout/default.vueでは使えなかった(pagesなら使える)
   data: () => ({
     clipped: false,
     drawer: false,
@@ -53,33 +54,31 @@ export default Vue.extend({
     right: true,
     rightDrawer: false,
     title: "コロナカレンダー",
-    items: Array<MenuObject>({ title: "全範囲グラフ", icon: "mdi-chart-bar", path: "/allchart" }),
+    items: Array<MenuObject>({
+      title: "全範囲グラフ",
+      icon: "mdi-chart-bar",
+      path: "/allchart",
+    }),
   }),
   created() {
-    (async () => {
-      // nuxt/contentを使ってCSVデータを読み込む
-      const asyncData = await this.$content("covid19").fetch();
-      const dataList = asyncData.body;
-      // カレンダーでも使う（/pages/_year/_month.vue）のでVuex
-      this.$store.commit("setCSVData", dataList);
-      // 月の配列を生成。Setなので被りが出ない
-      const monthTitleList = new Set<String>();
-      for (let index = 0; index < dataList.length; index++) {
-        const covid19 = dataList[index];
-        const date = new Date(covid19.公表_年月日);
-        monthTitleList.add(`${date.getFullYear()}/${date.getMonth() + 1}`);
-      }
-      // メニューに入れる
-      monthTitleList.forEach((title) => {
-        // オブジェクト作成
-        const menuObject: MenuObject = {
-          title: title,
-          path: `/${title}`,
-          icon: "mdi-calendar",
-        };
-        this.items.push(menuObject);
-      });
-    })();
+    const dataList = this.$store.state.csvData.body as any[];
+    // 月の配列を生成。Setなので被りが出ない
+    const monthTitleList = new Set<string>();
+    for (let index = 0; index < dataList.length; index++) {
+      const covid19 = dataList[index];
+      const date = new Date(covid19.公表_年月日);
+      monthTitleList.add(`${date.getFullYear()}/${date.getMonth() + 1}`);
+    }
+    // メニューに入れる
+    monthTitleList.forEach((title) => {
+      // オブジェクト作成
+      const menuObject: MenuObject = {
+        title: title,
+        path: `/${title}`,
+        icon: "mdi-calendar",
+      };
+      this.items.push(menuObject);
+    });
   },
 });
 </script>

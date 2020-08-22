@@ -13,9 +13,9 @@ export default Vue.extend({
   data: () => ({}),
   watch: {
     // 作成直後はchartDataは空っぽなので
-    chartData: (newValue, oldValue) => {
+    chartData: (newValue: Map<string, number>, oldValue: Map<string, number>) => {
       // グラフ
-      const ctx = document.getElementById("chart");
+      const ctx = <HTMLCanvasElement>document.getElementById("chart");
       var myChart = new Chart(ctx, {
         type: "bar",
         data: {

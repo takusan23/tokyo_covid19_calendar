@@ -25,16 +25,16 @@ interface EventObject {
 
 export default Vue.extend({
   data: () => ({
-    chartData: new Map<String, number>(),
+    chartData: new Map<string, number>(),
   }),
   mounted() {
     // タイトル変更
     this.$store.commit("setBarTitle", `全範囲グラフ`);
     // データ用意
     // Vuex Storeから取り出す
-    const csvData = this.$store.state.csvData;
+    const csvData = this.$store.state.csvData.body as any[];
     // 日付と感染者数のMap
-    const dayCountMap = new Map<String, number>();
+    const dayCountMap = new Map<string, number>();
     // 一日ごと
     csvData.forEach((item) => {
       // 一個ずつ見ていく
@@ -42,7 +42,7 @@ export default Vue.extend({
       const date = item.公表_年月日;
       if (dayCountMap.has(date)) {
         // キーが有る場合はカウントを増やす
-        dayCountMap.set(date, dayCountMap.get(date) + 1);
+        dayCountMap.set(date, dayCountMap.get(date)!! + 1);
       } else {
         // 無いので作成
         dayCountMap.set(date, 1);

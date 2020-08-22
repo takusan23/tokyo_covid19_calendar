@@ -13,3 +13,12 @@ export const mutations = {
         state.csvData = list
     }
 }
+
+// CSVデータを読み込む。asyncDataはlayout/default.vueでは使えなかった(pagesなら使える)
+export const actions = {
+    async nuxtServerInit({ commit }, { req }) {
+        // nuxt/contentで読み込む
+        const asyncData = await this.$content("covid19").fetch()
+        commit("setCSVData", asyncData)
+    }
+}

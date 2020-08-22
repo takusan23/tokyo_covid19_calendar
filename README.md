@@ -11,6 +11,7 @@
     - https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068
 - TypeScript
     - なんかあんま恩恵受けれてない
+    - `as any`しまくっているのでどうにかしたい。
 - Nuxt.js
     - 静的サイト書き出しが付いたVue.js
     - nuxt/contentでCSVデータを読み込んでる
@@ -25,8 +26,7 @@
     - https://koruri.github.io/
 
 # 仕組み
-`nuxt/content`モジュールを利用して、[東京都 新型コロナウイルス陽性患者発表詳細](https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068)のCSVデータを読み込みます。
-
+`nuxt/content`モジュールを利用して、[東京都 新型コロナウイルス陽性患者発表詳細](https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068)のCSVデータを読み込みます。  
 読み込むとJavaScript上で扱いやすい形式へ変換してくれます。
 
 ![Imgur](https://imgur.com/89DxYFw.png)
@@ -48,7 +48,8 @@
 npm run download
 ```
 
-少し待つと、`content/covid19.csv`にファイルがダウンロードされます。
+少し待つと、`content/covid19.csv`にファイルがダウンロードされます。  
+詳細は`download/main.js`参照
 
 そしたら
 
@@ -62,6 +63,34 @@ npm run dev
 ```
 npm run dev
 ```
+
+# ファイル構成
+- assets
+    - フォントファイルやCSS、SCSS（Vuetify上書き用）がおいてあります
+- components
+    - グラフ表示コンポーネントがあります
+    - AndroidのカスタムView的な
+- content
+    - 東京都 新型コロナウイルス陽性患者発表詳細 のCSVデータを置きます
+- download
+    - これはNuxt.jsの物じゃないです。
+    - 東京都 新型コロナウイルス陽性患者発表詳細 のCSVデータをダウンロードするJavaScriptファイルがあります
+- layout
+    - pagesを乗せるやつ。アプリのバーなどはここ
+    - AndroidのActivity的な
+- middleware
+    - ？
+- pages
+    - _year/_month.vue
+        - カレンダーとグラフを表示する
+    - layoutに乗せる
+    - AndroidのFragment的な
+- plugins
+    - ？
+- static
+    - 画像とかおいてある
+- store
+    - Nuxt.jsアプリで値を共有できるVuexのJSがおいてある
 
 # オープンソースライセンス
 - 東京都 新型コロナウイルス陽性患者発表詳細
