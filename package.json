@@ -1,0 +1,25 @@
+{
+  "name": "tokyo_covid19_calendar",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt-ts",
+    "download": "node download/main.js",
+    "build": "nuxt-ts build",
+    "start": "nuxt-ts start",
+    "generate": "nuxt-ts generate"
+  },
+  "dependencies": {
+    "@nuxt/content": "^1.5.0",
+    "@nuxt/typescript-runtime": "^1.0.0",
+    "@nuxtjs/pwa": "^3.0.0-beta.20",
+    "chart.js": "^2.9.3",
+    "moment": "^2.27.0",
+    "nuxt": "^2.14.0"
+  },
+  "devDependencies": {
+    "@nuxt/types": "^2.14.0",
+    "@nuxt/typescript-build": "^2.0.2",
+    "@nuxtjs/vuetify": "^1.11.2"
+  }
+}
