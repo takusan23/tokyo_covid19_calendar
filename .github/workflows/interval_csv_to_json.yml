@@ -28,12 +28,15 @@ jobs:
         run: npm run download
     
       # コミットする
-      - name: Commit JSON File
+      - name: Git Setting
         run: |
-          git config --global user.email ${{ secrets.MAIL }}"
-          git config --global user.name ${{ secrets.USER_NAME }}"
-          git commit -m "JSON File Update" -a
+          git config user.email ${{ secrets.MAIL }}"
+          git config user.name ${{ secrets.USER_NAME }}"
 
+      # Commit
+      - name: Commit
+        run: git commit -m "JSON File Update" -a
+        
       # Pushする
       - name: Push JSON File
         run: git push
