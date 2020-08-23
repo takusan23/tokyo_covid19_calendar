@@ -1,0 +1,47 @@
+# This is a basic workflow to help you get started with Actions
+
+name: IntervalNetlifyWebHook
+
+# このActionが実行されるイベント。今回は定期実行(schedule)と手動実行(workflow_dispatch)してほしいので
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * * # 日本時間で九時？
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # 環境
+    runs-on: ubuntu-latest
+    
+    # Node.jsを使うので
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x, 12.x]
+    
+    steps:
+    # リポジトリに触れるように
+    - uses: actions/checkout@v2
+
+    - name: Node.js Start
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    # 必要なものを入れる
+    - run: npm install
+      
+    # CSVファイルを落としてJSONファイルを作成するプログラム(download/main.js)を実行
+    - name: CSVFileToJSON
+    - run: npm run download
+    
+    # コミットする
+    - name: Commit JSON File
+      run: |
+        git config --local user.email ${{ secrets.MAIL }}"
+        git config --local user.name ${{ secrets.USER_NAME }}"
+        git commit -m "JSON File Update" -a
+
+    # Pushする
+    - name: Push JSON File
+      run: git push
