@@ -4,6 +4,7 @@ name: IntervalNetlifyWebHock
 
 # このActionが実行されるイベント。今回は定期実行してほしいので
 on:
+  workflow_dispatch:
   schedule:
     - cron: 0 0 * * *
 
