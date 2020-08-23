@@ -36,6 +36,6 @@ jobs:
       # Pushする
       - name: Push JSON File
         run: |
-           git commit -m "JSON File Update" -a
+           git commit -m "[GitHub Actions] JSON File Update" -a
            git pull
            git push origin master
