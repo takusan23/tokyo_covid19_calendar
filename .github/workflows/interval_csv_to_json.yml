@@ -5,8 +5,8 @@ name: CSVFileToJSONFile
 # このActionが実行されるイベント。今回は定期実行(schedule)と手動実行(workflow_dispatch)してほしいので
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 0 0 * * * # 日本時間で九時？
+  # schedule:
+  #  - cron: 0 0 * * * # 日本時間で九時？
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
