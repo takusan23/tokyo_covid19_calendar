@@ -1,5 +1,7 @@
 # tokyo_covid19_calendar
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/a4791628-eec0-426a-b8ba-b0bb4da09cd3/deploy-status)](https://app.netlify.com/sites/tokyo-covid19-calendar/deploys)
+
 カレンダーに感染者数を載せて見てみたいということで作ってみました。適当すぎる
 
 ![Imgur](https://imgur.com/zYyQyE6.png)
@@ -38,6 +40,8 @@ https://tokyo-covid19-calendar.netlify.app/
 ## GitHub Actions
 を利用して、NetlifyのWebHookを毎日朝九時に送るようにしてます（多分）
 
+GitHub Actionsについては自作ブログでちょっと書いた：https://takusan.negitoro.dev/posts/github_actions
+
 # 実行方法
 
 ## 必要なもの
@@ -46,8 +50,8 @@ https://tokyo-covid19-calendar.netlify.app/
 - VSCode
     - 宗教的に使えないなら別にいい
 
-## 一回目 もしくは CSVデータの更新をしたい場合
-初回実行時は [仕組み](#仕組み) のところでCSVデータを読み込むと書きました。そのCSVデータを取りに行く必要があります。
+## 一回目 もしくは データの更新をしたい場合
+`/content/data.json`と`/content/month_menu.json`を取得する必要があるので、
 
 ```
 npm run download
