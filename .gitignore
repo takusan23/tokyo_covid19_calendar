@@ -90,4 +90,6 @@ sw.*
 *.swp
 
 # conent/covid19.csvはGitHubに上げない
-content/covid19.csv
+/content/covid19.csv
+/content/data.json
+/content/month_menu.json

@@ -6,6 +6,8 @@
 
 週間ごとの人数やばくね？
 
+https://tokyo-covid19-calendar.netlify.app/
+
 # 使った技術的な
 - 東京都 新型コロナウイルス陽性患者発表詳細
     - https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068
@@ -26,12 +28,15 @@
     - https://koruri.github.io/
 
 # 仕組み
-`nuxt/content`モジュールを利用して、[東京都 新型コロナウイルス陽性患者発表詳細](https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000068)のCSVデータを読み込みます。  
-読み込むとJavaScript上で扱いやすい形式へ変換してくれます。
 
-![Imgur](https://imgur.com/89DxYFw.png)
+- `npm run download`を実行して、CSVデータをJSON形式へ変換します
+    - `content/data.json`と`content/month_menu.json`を生成します
+    - なお`.gitignore`に追記してるのでこの2つは見れないです。
+- `content/data.json`を`nuxt/content`モジュールを利用して読み込みます
+    - `pages/_year/_month.vue`参照
 
-あとはVuetifyのカレンダーで表示できるように変換したりしてます。
+## GitHub Actions
+を利用して、NetlifyのWebHookを毎日朝九時に送るようにしてます（多分）
 
 # 実行方法
 
@@ -48,8 +53,9 @@
 npm run download
 ```
 
-少し待つと、`content/covid19.csv`にファイルがダウンロードされます。  
-詳細は`download/main.js`参照
+少し待つと、`/content/covid19.csv`、`/content/data.json`、`content/month_menu.json`が生成されます。  
+
+詳細は`/download/main.js`参照
 
 そしたら
 
@@ -63,7 +69,7 @@ npm run dev
 `npm run download && npm run generate`  
 になっている。
 
-## 二回目以降（CSVデータの更新が必要ない場合）
+## 二回目以降（データの更新が必要ない場合）
 ```
 npm run dev
 ```
