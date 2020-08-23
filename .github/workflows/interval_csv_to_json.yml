@@ -30,13 +30,12 @@ jobs:
       # コミットする
       - name: Git Setting
         run: |
-          git config user.email ${{ secrets.MAIL }}"
-          git config user.name ${{ secrets.USER_NAME }}"
-
-      # Commit
-      - name: Commit
-        run: git commit -m "JSON File Update" -a
-        
+          git config --local user.email ${{ secrets.MAIL }}"
+          git config --local user.name ${{ secrets.USER_NAME }}"
+                  
       # Pushする
       - name: Push JSON File
-        run: git push
+        run: |
+           git commit -m "JSON File Update" -a
+           git pull
+           git push origin master
