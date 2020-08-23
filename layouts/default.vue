@@ -36,6 +36,8 @@
 
 <script lang="ts">
 import Vue from "vue";
+// メニューJSON
+import menuJSON from "../content/month_menu.json";
 
 /** ナビゲーションドロワーのメニューの型定義 */
 interface MenuObject {
@@ -45,7 +47,6 @@ interface MenuObject {
 }
 
 export default Vue.extend({
-  // CSVデータを読み込む。asyncDataはlayout/default.vueでは使えなかった(pagesなら使える)
   data: () => ({
     clipped: false,
     drawer: false,
@@ -61,23 +62,13 @@ export default Vue.extend({
     }),
   }),
   created() {
-    const dataList = this.$store.state.csvData.body as any[];
-    // 月の配列を生成。Setなので被りが出ない
-    const monthTitleList = new Set<string>();
-    for (let index = 0; index < dataList.length; index++) {
-      const covid19 = dataList[index];
-      const date = new Date(covid19.公表_年月日);
-      monthTitleList.add(`${date.getFullYear()}/${date.getMonth() + 1}`);
-    }
-    // メニューに入れる
-    monthTitleList.forEach((title) => {
-      // オブジェクト作成
-      const menuObject: MenuObject = {
-        title: title,
-        path: `/${title}`,
+    menuJSON.forEach((menu) => {
+      const menuObj = {
+        title: menu,
         icon: "mdi-calendar",
+        path: `/${menu}`,
       };
-      this.items.push(menuObject);
+      this.items.push(menuObj);
     });
   },
 });

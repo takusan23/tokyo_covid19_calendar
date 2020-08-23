@@ -1,7 +1,8 @@
 // Vue全体で管理したい値。今回はタイトルバーのテキスト
 export const state = () => ({
     barTitle: "コロナカレンダー",
-    csvData: []
+    csvData: [],
+    menuList: []
 })
 
 // Vuexの値はここで変更する。
@@ -11,10 +12,13 @@ export const mutations = {
     },
     setCSVData(state, list) {
         state.csvData = list
+    },
+    setMenuList(state, menu) {
+        state.menuList = menu
     }
 }
 
-// CSVデータを読み込む。asyncDataはlayout/default.vueでは使えなかった(pagesなら使える)
+// メニューJSONを読み込む(content/menu)
 export const actions = {
     async nuxtServerInit({ commit }, { req }) {
         // nuxt/contentで読み込む

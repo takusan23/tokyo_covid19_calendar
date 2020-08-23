@@ -23,32 +23,41 @@ interface EventObject {
   end?: string;
 }
 
+interface DataJSON {
+  date: string;
+  count: CountJSON;
+}
+
+interface CountJSON {
+  total: number;
+}
+
 export default Vue.extend({
+  async asyncData({ $content, params }) {
+    // content/data.json読み込み
+    const jsonData = await $content("data").fetch();
+
+    // データ(オブジェクト)だけのJSON配列に（拡張子の情報とかいらん）
+    const jsonList = new Array<DataJSON>();
+    (Object.values(jsonData) as DataJSON[]).forEach((json) => {
+      if (json.date !== undefined) {
+        jsonList.push(json);
+      }
+    });
+    // グラフにわたすデータ
+    const chartData = new Map<String, number>();
+    jsonList.forEach((json) => {
+      chartData.set(json.date, json.count.total);
+    });
+    return { chartData: chartData };
+  },
   data: () => ({
     chartData: new Map<string, number>(),
   }),
   mounted() {
     // タイトル変更
     this.$store.commit("setBarTitle", `全範囲グラフ`);
-    // データ用意
-    // Vuex Storeから取り出す
-    const csvData = this.$store.state.csvData.body as any[];
-    // 日付と感染者数のMap
-    const dayCountMap = new Map<string, number>();
-    // 一日ごと
-    csvData.forEach((item) => {
-      // 一個ずつ見ていく
-      // 日付
-      const date = item.公表_年月日;
-      if (dayCountMap.has(date)) {
-        // キーが有る場合はカウントを増やす
-        dayCountMap.set(date, dayCountMap.get(date)!! + 1);
-      } else {
-        // 無いので作成
-        dayCountMap.set(date, 1);
-      }
-      this.chartData = dayCountMap;
-    });
+    this.chartData = new Map(this.chartData);
   },
 });
 </script>

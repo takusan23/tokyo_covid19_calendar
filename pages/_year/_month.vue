@@ -26,7 +26,7 @@ import moment, { months } from "moment"; // 時間操作
 import Chart from "chart.js"; // グラフ
 import BarChart from "../../components/BarChart.vue"; // グラフ。そういえばcomponent:{}書かずに済むようになったの？
 
-/** カレンダーに入れるオブジェクトの型定義ファイル。本当は外に置くべき？ */
+/** カレンダーに入れるオブジェクトの型定義。本当は外に置くべき？ */
 interface EventObject {
   /** @param name カレンダーに入れるテキスト */
   name: string;
@@ -40,54 +40,55 @@ interface EventObject {
   end?: string;
 }
 
-export default Vue.extend({
-  data: () => ({
-    events: Array<EventObject>(),
-    start: moment().format("YYYY-MM-DD"), // カレンダーの月を設定する場合は
-    shortWeek: false,
-    shortMonth: false,
-    formatStartTime: moment().format("YYYY年MM月"), // h1に表示してるやつ
-    month: moment().month(), // 今の月
-    chartData: new Map<String, number>(),
-  }),
-  mounted() {
-    // もし時刻を指定している場合は
-    this.setCalendarDate();
+/** content/data.json の型 */
+interface DataJSON {
+  /** @param date 日付。YYYY/MM/DD */
+  date: string;
+  /** 感染者数 */
+  count: CountJSON;
+}
 
-    // 日付と感染者数のMap
-    const dayCountMap = new Map<string, number>();
-    // Vuex Storeから取り出す
-    const csvData = this.$store.state.csvData.body as any[];
-    // 一日ごと
-    csvData.forEach((item) => {
-      // 一個ずつ見ていく
-      // 日付
-      const date = item.公表_年月日;
-      if (dayCountMap.has(date)) {
-        // キーが有る場合はカウントを増やす
-        dayCountMap.set(date, dayCountMap.get(date)!! + 1);
-      } else {
-        // 無いので作成
-        dayCountMap.set(date, 1);
+/** content/data.json のcontentオブジェクトの型 */
+interface CountJSON {
+  /** トータル人数。他にも20代とかある */
+  total: number;
+}
+
+export default Vue.extend({
+  async asyncData({ $content, params }) {
+    // content/data.json読み込み
+    const jsonData = await $content("data").fetch();
+
+    // データ(オブジェクト)だけのJSON配列に（拡張子の情報とかいらん）
+    const jsonList = new Array<DataJSON>();
+    (Object.values(jsonData) as DataJSON[]).forEach((json) => {
+      if (json.date !== undefined) {
+        jsonList.push(json);
       }
     });
-    // this.events配列に格納
-    dayCountMap.forEach((value, key) => {
-      // 次の日に変わった
-      const event: EventObject = {
-        name: `${value} 人`,
-        count: value,
-        start: key.toString(),
-        type: "date",
-      };
-      this.events.push(event);
+
+    // 日ごと
+    const eventsList = new Array<EventObject>();
+    jsonList.forEach((data) => {
+      if (data.date !== undefined) {
+        // 今月だけ
+        const calendar = moment(data.date);
+        const event: EventObject = {
+          name: `${data.count.total} 人`,
+          count: data.count.total,
+          start: moment(data.date).format("YYYY-MM-DD"),
+          type: "date",
+        };
+        eventsList.push(event);
+      }
     });
+
     // 一週間ごとの 何週目 と カレンダーに入れるオブジェクト のMap
     const weekCountMap = new Map<number, EventObject>();
     // 一日ごとの配列を使って一週間ごとに
-    this.events.forEach((item) => {
+    eventsList.forEach((item) => {
       // moment.jsの恩恵を受ける
-      const calendar = moment(item.start.toString());
+      const calendar = moment(item.start);
       const startCalendar = calendar.day("Sunday").clone(); // 日曜日の日付を取得。これできるの有能では
       const endCalendar = calendar.day("Sataday").clone(); // 土曜日の日付を取得
       // （年間）何週目か
@@ -118,11 +119,36 @@ export default Vue.extend({
     });
     // this.events配列に格納
     weekCountMap.forEach((value, key) => {
-      this.events.push(value);
+      eventsList.push(value);
     });
 
-    // グラフ用意
-    this.chartData = this.getDayCountMapFilterNowMonth(this.month, dayCountMap);
+    return { events: eventsList };
+  },
+  data: () => ({
+    events: Array<EventObject>(),
+    start: moment().format("YYYY-MM-DD"), // カレンダーの月を設定する場合は
+    shortWeek: false,
+    shortMonth: false,
+    formatStartTime: moment().format("YYYY年MM月"), // h1に表示してるやつ
+    month: moment().month(), // 今の月
+    chartData: new Map<String, number>(),
+  }),
+  mounted() {
+    // カレンダーの月を設定する
+    this.setCalendarDate();
+
+    // グラフにわたすデータ。なおthis.eventsは週間の値もあるので注意して
+    const dateOnlyList = this.events.filter((event) => event.type == "date") as EventObject[] 
+    dateOnlyList.forEach((json) => {
+      const month = this.$route.params.month;
+      const calendar = moment(json.start);
+      const setCalendar = moment().set("month", parseInt(month) - 1);
+      if (calendar.month() == setCalendar.month()) {
+        // 同じ月
+        this.chartData.set(json.start, json.count);
+      }
+    });
+    this.chartData = new Map(this.chartData);
   },
   methods: {
     toLocaleDate(date: Date) {
@@ -153,16 +179,16 @@ export default Vue.extend({
       }
     },
     // 指定した月の値だけ返す
-    getDayCountMapFilterNowMonth(month: number, monthMap: Map<String, number>) {
+    getDayCountMapFilterNowMonth(month: number, monthMap: any) {
       const returnMap = new Map<String, number>();
-      monthMap.forEach((value, key) => {
-        const calendar = moment(key.toString());
-        const setCalendar = moment().set("month", month);
-        if (calendar.month() == setCalendar.month()) {
-          // 同じ月
-          returnMap.set(key, value);
-        }
-      });
+      // monthMap.forEach((json) => {
+      //   const calendar = moment(json.date.toString());
+      //   const setCalendar = moment().set("month", month);
+      //   if (calendar.month() == setCalendar.month()) {
+      //     // 同じ月
+      //     returnMap.set(json.date, json.count.total);
+      //   }
+      // });
       return returnMap;
     },
   },
