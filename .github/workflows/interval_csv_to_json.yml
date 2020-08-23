@@ -24,16 +24,13 @@ jobs:
       # リポジトリに触れるように
       - uses: actions/checkout@v2
 
-      - name: Node.js Start
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       # 必要なものを入れる
-      - run: npm install
+      - name: Node.js Start
+        run: npm install
       
       # CSVファイルを落としてJSONファイルを作成するプログラム(download/main.js)を実行
       - name: CSVFileToJSON
-      - run: npm run download
+        run: npm run download
     
       # コミットする
       - name: Commit JSON File
