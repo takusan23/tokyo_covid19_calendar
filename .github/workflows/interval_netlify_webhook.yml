@@ -1,0 +1,24 @@
+# Netlifyへ一日一回ビルドしろって送る
+
+name: IntervalNetlifyWebHook
+
+# このActionが実行されるイベント。今回は定期実行(schedule)と手動実行(workflow_dispatch)してほしいので
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * * # 日本時間で九時？
+
+# こっから
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # 環境
+    runs-on: ubuntu-latest
+
+    # やることリスト
+    steps:
+      # NetlifyのWebHookを叩く？
+      - name: Github Action for curl
+        uses: wei/curl@v1.1.1
+        with:
+          args: -X POST -d {} ${{ secrets.WEBHOOK_URL }}
