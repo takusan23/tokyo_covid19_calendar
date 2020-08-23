@@ -1,8 +1,8 @@
 # This is a basic workflow to help you get started with Actions
 
-name: IntervalNetlifyWebHock
+name: IntervalNetlifyWebHook
 
-# このActionが実行されるイベント。今回は定期実行してほしいので
+# このActionが実行されるイベント。今回は定期実行(schedule)と手動実行(workflow_dispatch)してほしいので
 on:
   workflow_dispatch:
   schedule:
@@ -20,7 +20,7 @@ jobs:
     - name: Run a one-line script
       run: echo WebHook!
       
-    - name: Workflow Webhook Action
-      uses: distributhor/workflow-webhook@v1.0.2
-      env:
-        webhook_url: ${{ secrets.WEBHOOK_URL }}
+    - name: Github Action for curl
+      uses: wei/curl@v1.1.1
+      with:
+        args: -X POST -d {} ${{ secrets.WEBHOOK_URL }}
