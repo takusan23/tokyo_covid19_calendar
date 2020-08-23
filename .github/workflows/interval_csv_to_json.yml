@@ -21,27 +21,27 @@ jobs:
         node-version: [8.x, 10.x, 12.x]
     
     steps:
-    # リポジトリに触れるように
-    - uses: actions/checkout@v2
+      # リポジトリに触れるように
+      - uses: actions/checkout@v2
 
-    - name: Node.js Start
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    # 必要なものを入れる
-    - run: npm install
+      - name: Node.js Start
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      # 必要なものを入れる
+      - run: npm install
       
-    # CSVファイルを落としてJSONファイルを作成するプログラム(download/main.js)を実行
-    - name: CSVFileToJSON
-    - run: npm run download
+      # CSVファイルを落としてJSONファイルを作成するプログラム(download/main.js)を実行
+      - name: CSVFileToJSON
+      - run: npm run download
     
-    # コミットする
-    - name: Commit JSON File
-      run: |
-        git config --local user.email ${{ secrets.MAIL }}"
-        git config --local user.name ${{ secrets.USER_NAME }}"
-        git commit -m "JSON File Update" -a
+      # コミットする
+      - name: Commit JSON File
+        run: |
+          git config --local user.email ${{ secrets.MAIL }}"
+          git config --local user.name ${{ secrets.USER_NAME }}"
+          git commit -m "JSON File Update" -a
 
-    # Pushする
-    - name: Push JSON File
-      run: git push
+      # Pushする
+      - name: Push JSON File
+        run: git push
