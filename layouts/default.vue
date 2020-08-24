@@ -55,11 +55,18 @@ export default Vue.extend({
     right: true,
     rightDrawer: false,
     title: "コロナカレンダー",
-    items: Array<MenuObject>({
-      title: "全範囲グラフ",
-      icon: "mdi-chart-bar",
-      path: "/allchart",
-    }),
+    items: Array<MenuObject>(
+      {
+        title: "トップ",
+        icon: "mdi-calendar-multiple",
+        path: "/",
+      },
+      {
+        title: "全範囲グラフ",
+        icon: "mdi-chart-bar",
+        path: "/allchart",
+      }
+    ),
   }),
   created() {
     menuJSON.forEach((menu) => {

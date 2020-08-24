@@ -13,7 +13,10 @@ export default Vue.extend({
   data: () => ({}),
   watch: {
     // 作成直後はchartDataは空っぽなので
-    chartData: (newValue: Map<string, number>, oldValue: Map<string, number>) => {
+    chartData: (
+      newValue: Map<string, number>,
+      oldValue: Map<string, number>
+    ) => {
       // グラフ
       const ctx = <HTMLCanvasElement>document.getElementById("chart");
       var myChart = new Chart(ctx, {

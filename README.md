@@ -105,6 +105,8 @@ npm run dev
     - 画像とかおいてある
 - store
     - Nuxt.jsアプリで値を共有できるVuexのJSがおいてある
+- ts
+    - TypeScriptのInterfaceとか`ObjectType.ts`、JSON配列を変換するコード（`SetCalendarData.ts`）がおいてある。他でも使うので切り出した。
 
 # オープンソースライセンス
 - 東京都 新型コロナウイルス陽性患者発表詳細

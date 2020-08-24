@@ -4,16 +4,7 @@
     <v-card class="pa-3 ma-3" elevation="10">
       <p style="font-size:30px">{{formatStartTime}}</p>
       <v-switch v-model="isCheck" label="詳細表示"></v-switch>
-      <v-calendar
-        ref="calendar"
-        :event-color="getEventColor"
-        :events="events"
-        :start="start"
-        :short-months="shortMonth"
-        :short-weekdays="shortWeek"
-        color="primary"
-        type="month"
-      ></v-calendar>
+      <Calendar :event-data="events" :calendar-start="start" />
     </v-card>
     <v-card class="pa-3 ma-3" elevation="10">
       <BarChart height="90%" :chartData="chartData" />
@@ -24,38 +15,8 @@
 <script lang="ts">
 import Vue from "vue";
 import moment, { months } from "moment"; // 時間操作
-import Chart from "chart.js"; // グラフ
-import BarChart from "../../components/BarChart.vue"; // グラフ。そういえばcomponent:{}書かずに済むようになったの？
-
-/** カレンダーに入れるオブジェクトの型定義。本当は外に置くべき？ */
-interface EventObject {
-  /** @param name カレンダーに入れるテキスト */
-  name: string;
-  /** @param type 日か週 */
-  type: "date" | "week";
-  /** 件数 */
-  count: number;
-  /** 開始時間 か 日をまたがない場合は日付 */
-  start: string;
-  /** 日をまたいだときの終わりの日付。跨がない場合はnull */
-  end?: string;
-  /** 年齢。詳細表示以外では存在しない。30代など */
-  old?: string;
-}
-
-/** content/data.json の型 */
-interface DataJSON {
-  /** @param date 日付。YYYY/MM/DD */
-  date: string;
-  /** 感染者数 */
-  count: CountJSON;
-}
-
-/** content/data.json のcontentオブジェクトの型 */
-interface CountJSON {
-  /** トータル人数。他にも20代とかある */
-  total: number;
-}
+import { setCalendarData, listSortCount } from "@/ts/SetCalendarData.ts"; // JSON配列をVuetifyのカレンダーに入れられるように変換する関数
+import { EventObject, DataJSON, CountJSON } from "@/ts/ObjectType.ts"; // 型定義
 
 export default Vue.extend({
   async asyncData({ $content, params }) {
@@ -95,6 +56,10 @@ export default Vue.extend({
       // カレンダーの予定を消す
       this.events = new Array();
       setCalendarData(this.json, this.events, this.isCheck);
+      if (this.isCheck) {
+        // 詳細表示時
+        this.events = listSortCount(this.events);
+      }
     },
   },
   mounted() {
@@ -120,14 +85,6 @@ export default Vue.extend({
     toLocaleDate(date: Date) {
       return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     },
-    // 色を設定する。eventは予定オブジェクト
-    getEventColor(event: EventObject) {
-      let color = "orange";
-      if (event.type == "date") {
-        color = "blue";
-      }
-      return color;
-    },
     // カレンダーの月を設定する
     setCalendarDate() {
       const paramMonth = this.$route.params.month;
@@ -146,95 +103,4 @@ export default Vue.extend({
     },
   },
 });
-
-/**
- * DataJSONの配列をカレンダーにセットする
- * @param sourceList 元のJSON
- * @param eventsList カレンダーに入れるイベントの配列。:events
- * @param isAdvancedMode 詳細表示を利用する場合
- */
-const setCalendarData = (
-  sourceList: Array<DataJSON>,
-  eventsList: Array<EventObject>,
-  isAdvancedMode: boolean
-) => {
-  sourceList.forEach((data) => {
-    if (data.date !== undefined) {
-      const calendar = moment(data.date);
-      // 詳細表示？
-      if (isAdvancedMode) {
-        // 詳細表示？
-        Object.keys(data.count).forEach((key) => {
-          // キーを取り出す。as any どうにかしたい
-          const keyValue = (data.count as any)[key];
-          const event: EventObject = {
-            name: `${key}：${keyValue} 人`,
-            count: keyValue,
-            start: moment(data.date).format("YYYY-MM-DD"),
-            type: "date",
-            old: key,
-          };
-          eventsList.push(event);
-        });
-      } else {
-        const event: EventObject = {
-          name: `${data.count.total} 人`,
-          count: data.count.total,
-          start: moment(data.date).format("YYYY-MM-DD"),
-          type: "date",
-        };
-        eventsList.push(event);
-      }
-    }
-  });
-
-  // 一週間ごとの 何週目-年齢文字列 と カレンダーに入れるオブジェクト のMap
-  // 5-20代 to 5
-  const weekCountMap = new Map<string, EventObject>();
-  // 一日ごとの配列を使って一週間ごとに
-  eventsList.forEach((item) => {
-    // moment.jsの恩恵を受ける
-    const calendar = moment(item.start);
-    const startCalendar = calendar.day("Sunday").clone(); // 日曜日の日付を取得。これできるの有能では
-    const endCalendar = calendar.day("Sataday").clone(); // 土曜日の日付を取得
-    // （年間）何週目か
-    const calcWeek = calendar.week();
-
-    // すでにある場合は
-    if (weekCountMap.has(`${calcWeek}-${item.old}`)) {
-      // キーが有る場合はカウントを増やす
-      const event = weekCountMap.get(`${calcWeek}-${item.old}`)!!;
-      const data: EventObject = {
-        name: `${event.count + item.count} 人`,
-        count: event.count + item.count,
-        start: event.start,
-        end: event.end,
-        type: "week",
-      };
-      // 詳細表示時
-      if (isAdvancedMode) {
-        data.name = `${item.old}：${data.count} 人`;
-      }
-      weekCountMap.set(`${calcWeek}-${item.old}`, data);
-    } else {
-      const data: EventObject = {
-        name: `${item.count} 人`,
-        count: item.count,
-        start: startCalendar.format("YYYY-MM-DD"),
-        end: endCalendar.format("YYYY-MM-DD"),
-        type: "week",
-      };
-      // 詳細表示時
-      if (isAdvancedMode) {
-        data.name = `${item.old}：${data.count} 人`;
-      }
-      // 無いので作成
-      weekCountMap.set(`${calcWeek}-${item.old}`, data);
-    }
-  });
-  // this.events配列に格納
-  weekCountMap.forEach((value, key) => {
-    eventsList.push(value);
-  });
-};
 </script>

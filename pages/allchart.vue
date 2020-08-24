@@ -8,29 +8,7 @@
 <script lang="ts">
 import Vue from "vue";
 import BarChart from "../components/BarChart.vue"; // グラフ
-
-/** カレンダーに入れるオブジェクトの型定義ファイル。本当は外に置くべき？ */
-interface EventObject {
-  /** @param name カレンダーに入れるテキスト */
-  name: string;
-  /** @param type 日か週 */
-  type: "date" | "week";
-  /** 件数 */
-  count: number;
-  /** 開始時間 か 日をまたがない場合は日付 */
-  start: string;
-  /** 日をまたいだときの終わりの日付。跨がない場合はnull */
-  end?: string;
-}
-
-interface DataJSON {
-  date: string;
-  count: CountJSON;
-}
-
-interface CountJSON {
-  total: number;
-}
+import { EventObject, DataJSON, CountJSON } from "@/ts/ObjectType.ts"; // 型定義
 
 export default Vue.extend({
   async asyncData({ $content, params }) {
