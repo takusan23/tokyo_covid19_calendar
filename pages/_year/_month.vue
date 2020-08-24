@@ -3,6 +3,7 @@
   <div>
     <v-card class="pa-3 ma-3" elevation="10">
       <p style="font-size:30px">{{formatStartTime}}</p>
+      <v-switch v-model="isCheck" label="詳細表示"></v-switch>
       <v-calendar
         ref="calendar"
         :event-color="getEventColor"
@@ -38,6 +39,8 @@ interface EventObject {
   start: string;
   /** 日をまたいだときの終わりの日付。跨がない場合はnull */
   end?: string;
+  /** 年齢。詳細表示以外では存在しない。30代など */
+  old?: string;
 }
 
 /** content/data.json の型 */
@@ -69,60 +72,11 @@ export default Vue.extend({
 
     // 日ごと
     const eventsList = new Array<EventObject>();
-    jsonList.forEach((data) => {
-      if (data.date !== undefined) {
-        // 今月だけ
-        const calendar = moment(data.date);
-        const event: EventObject = {
-          name: `${data.count.total} 人`,
-          count: data.count.total,
-          start: moment(data.date).format("YYYY-MM-DD"),
-          type: "date",
-        };
-        eventsList.push(event);
-      }
-    });
 
-    // 一週間ごとの 何週目 と カレンダーに入れるオブジェクト のMap
-    const weekCountMap = new Map<number, EventObject>();
-    // 一日ごとの配列を使って一週間ごとに
-    eventsList.forEach((item) => {
-      // moment.jsの恩恵を受ける
-      const calendar = moment(item.start);
-      const startCalendar = calendar.day("Sunday").clone(); // 日曜日の日付を取得。これできるの有能では
-      const endCalendar = calendar.day("Sataday").clone(); // 土曜日の日付を取得
-      // （年間）何週目か
-      const calcWeek = calendar.week();
-      // すでにある場合は
-      if (weekCountMap.has(calcWeek)) {
-        // キーが有る場合はカウントを増やす
-        const event = weekCountMap.get(calcWeek)!!;
-        const data: EventObject = {
-          name: `${event.count + item.count} 人`,
-          count: event.count + item.count,
-          start: event.start,
-          end: event.end,
-          type: "week",
-        };
-        weekCountMap.set(calcWeek, data);
-      } else {
-        const data: EventObject = {
-          name: `${item.count} 人`,
-          count: item.count,
-          start: startCalendar.format("YYYY-MM-DD"),
-          end: endCalendar.format("YYYY-MM-DD"),
-          type: "week",
-        };
-        // 無いので作成
-        weekCountMap.set(calcWeek, data);
-      }
-    });
-    // this.events配列に格納
-    weekCountMap.forEach((value, key) => {
-      eventsList.push(value);
-    });
+    // カレンダーに入れる
+    setCalendarData(jsonList, eventsList, false);
 
-    return { events: eventsList };
+    return { events: eventsList, json: jsonList };
   },
   data: () => ({
     events: Array<EventObject>(),
@@ -132,13 +86,25 @@ export default Vue.extend({
     formatStartTime: moment().format("YYYY年MM月"), // h1に表示してるやつ
     month: moment().month(), // 今の月
     chartData: new Map<String, number>(),
+    isCheck: false,
+    json: Array<DataJSON>(), // asyncDataで読み込んだJSON
   }),
+  watch: {
+    // Swtich変更を検知
+    isCheck: function () {
+      // カレンダーの予定を消す
+      this.events = new Array();
+      setCalendarData(this.json, this.events, this.isCheck);
+    },
+  },
   mounted() {
     // カレンダーの月を設定する
     this.setCalendarDate();
 
     // グラフにわたすデータ。なおthis.eventsは週間の値もあるので注意して
-    const dateOnlyList = this.events.filter((event) => event.type == "date") as EventObject[] 
+    const dateOnlyList = this.events.filter(
+      (event) => event.type == "date"
+    ) as EventObject[];
     dateOnlyList.forEach((json) => {
       const month = this.$route.params.month;
       const calendar = moment(json.start);
@@ -178,19 +144,97 @@ export default Vue.extend({
         );
       }
     },
-    // 指定した月の値だけ返す
-    getDayCountMapFilterNowMonth(month: number, monthMap: any) {
-      const returnMap = new Map<String, number>();
-      // monthMap.forEach((json) => {
-      //   const calendar = moment(json.date.toString());
-      //   const setCalendar = moment().set("month", month);
-      //   if (calendar.month() == setCalendar.month()) {
-      //     // 同じ月
-      //     returnMap.set(json.date, json.count.total);
-      //   }
-      // });
-      return returnMap;
-    },
   },
 });
+
+/**
+ * DataJSONの配列をカレンダーにセットする
+ * @param sourceList 元のJSON
+ * @param eventsList カレンダーに入れるイベントの配列。:events
+ * @param isAdvancedMode 詳細表示を利用する場合
+ */
+const setCalendarData = (
+  sourceList: Array<DataJSON>,
+  eventsList: Array<EventObject>,
+  isAdvancedMode: boolean
+) => {
+  sourceList.forEach((data) => {
+    if (data.date !== undefined) {
+      const calendar = moment(data.date);
+      // 詳細表示？
+      if (isAdvancedMode) {
+        // 詳細表示？
+        Object.keys(data.count).forEach((key) => {
+          // キーを取り出す。as any どうにかしたい
+          const keyValue = (data.count as any)[key];
+          const event: EventObject = {
+            name: `${key}：${keyValue} 人`,
+            count: keyValue,
+            start: moment(data.date).format("YYYY-MM-DD"),
+            type: "date",
+            old: key,
+          };
+          eventsList.push(event);
+        });
+      } else {
+        const event: EventObject = {
+          name: `${data.count.total} 人`,
+          count: data.count.total,
+          start: moment(data.date).format("YYYY-MM-DD"),
+          type: "date",
+        };
+        eventsList.push(event);
+      }
+    }
+  });
+
+  // 一週間ごとの 何週目-年齢文字列 と カレンダーに入れるオブジェクト のMap
+  // 5-20代 to 5
+  const weekCountMap = new Map<string, EventObject>();
+  // 一日ごとの配列を使って一週間ごとに
+  eventsList.forEach((item) => {
+    // moment.jsの恩恵を受ける
+    const calendar = moment(item.start);
+    const startCalendar = calendar.day("Sunday").clone(); // 日曜日の日付を取得。これできるの有能では
+    const endCalendar = calendar.day("Sataday").clone(); // 土曜日の日付を取得
+    // （年間）何週目か
+    const calcWeek = calendar.week();
+
+    // すでにある場合は
+    if (weekCountMap.has(`${calcWeek}-${item.old}`)) {
+      // キーが有る場合はカウントを増やす
+      const event = weekCountMap.get(`${calcWeek}-${item.old}`)!!;
+      const data: EventObject = {
+        name: `${event.count + item.count} 人`,
+        count: event.count + item.count,
+        start: event.start,
+        end: event.end,
+        type: "week",
+      };
+      // 詳細表示時
+      if (isAdvancedMode) {
+        data.name = `${item.old}：${data.count} 人`;
+      }
+      weekCountMap.set(`${calcWeek}-${item.old}`, data);
+    } else {
+      const data: EventObject = {
+        name: `${item.count} 人`,
+        count: item.count,
+        start: startCalendar.format("YYYY-MM-DD"),
+        end: endCalendar.format("YYYY-MM-DD"),
+        type: "week",
+      };
+      // 詳細表示時
+      if (isAdvancedMode) {
+        data.name = `${item.old}：${data.count} 人`;
+      }
+      // 無いので作成
+      weekCountMap.set(`${calcWeek}-${item.old}`, data);
+    }
+  });
+  // this.events配列に格納
+  weekCountMap.forEach((value, key) => {
+    eventsList.push(value);
+  });
+};
 </script>
