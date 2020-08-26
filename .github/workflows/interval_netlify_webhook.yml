@@ -6,7 +6,7 @@ name: IntervalNetlifyWebHook
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 15 * * *' # 日本時間で九時？
+    - cron: '0 15 * * *' # UTC 15 = JST 0
 
 # こっから
 jobs:
