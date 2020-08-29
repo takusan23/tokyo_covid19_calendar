@@ -10,7 +10,7 @@
             <!-- 詳細へボタン -->
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <v-btn icon v-bind="attrs" v-on="on" @click="openCalendar(col)">
+                <v-btn icon v-bind="attrs" v-on="on" link :to="openCalendar(col)">
                   <v-icon>mdi-open-in-new</v-icon>
                 </v-btn>
               </template>
@@ -73,7 +73,7 @@ export default Vue.extend({
       const calendar = moment()
         .month(month - 1)
         .date(1);
-      this.$router.push(calendar.format("YYYY/MM"));
+      return calendar.format("/YYYY/MM")
     },
   },
 });
