@@ -25,8 +25,10 @@ export const setCalendarData = (
                 Object.keys(data.count).forEach((key) => {
                     // キーを取り出す。as any どうにかしたい
                     const keyValue = (data.count as any)[key];
+                    // パーセントを出す
+                    const par = (((keyValue as number) / data.count.total) * 100).toFixed(2)
                     const event: EventObject = {
-                        name: `${key}：${keyValue} 人`,
+                        name: `${key}：${keyValue} 人 (${par} %)`,
                         count: keyValue,
                         start: moment(data.date).format("YYYY-MM-DD"),
                         type: "date",
@@ -53,15 +55,17 @@ export const setCalendarData = (
     eventsList.forEach((item) => {
         // moment.jsの恩恵を受ける
         const calendar = moment(item.start);
+        
+        // 週初めの日付
         const startCalendar = calendar.day("Sunday").clone(); // 日曜日の日付を取得。これできるの有能では
         const endCalendar = calendar.day("Sataday").clone(); // 土曜日の日付を取得
         // （年間）何週目か
         const calcWeek = calendar.week();
-
         // すでにある場合は
         if (weekCountMap.has(`${calcWeek}-${item.old}`)) {
             // キーが有る場合はカウントを増やす
             const event = weekCountMap.get(`${calcWeek}-${item.old}`)!!;
+            // パーセントだす
             const data: EventObject = {
                 name: `${event.count + item.count} 人`,
                 count: event.count + item.count,
