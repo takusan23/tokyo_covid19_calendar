@@ -2,7 +2,16 @@
 <template>
   <div>
     <v-card class="pa-3 ma-3" elevation="10">
-      <p style="font-size:30px">{{formatStartTime}}</p>
+      <v-row>
+        <v-col>
+          <p style="font-size: 30px">{{ formatStartTime }}</p>
+        </v-col>
+        <v-col>
+          <p style="font-size: 30px; white-space: nowrap" align="end">
+            合計 {{ totalCount }} 人
+          </p>
+        </v-col>
+      </v-row>
       <v-switch v-model="isCheck" label="詳細表示"></v-switch>
       <Calendar :event-data="events" :calendar-start="start" />
     </v-card>
@@ -37,7 +46,24 @@ export default Vue.extend({
     // カレンダーに入れる
     setCalendarData(jsonList, eventsList, false);
 
-    return { events: eventsList, json: jsonList };
+    // トータル感染者数
+    let totalCount = 0;
+    const paramMonth = params.month;
+    const paramYear = params.year;
+    if (paramMonth !== undefined && paramYear !== undefined) {
+      const month = parseInt(paramMonth);
+      const year = parseInt(paramYear);
+      // その月のユーザーを数える
+      totalCount = jsonList
+        .filter((data) => {
+          const calendar = moment(data.date);
+          return calendar.month() === month - 1 && calendar.year() === year;
+        })
+        .map((data) => data.count.total) // 人数のみ
+        .reduce((a, b) => a + b); // 合計を足す
+    }
+
+    return { events: eventsList, json: jsonList, totalCount: totalCount };
   },
   data: () => ({
     events: Array<EventObject>(),
@@ -49,6 +75,7 @@ export default Vue.extend({
     chartData: new Map<String, number>(),
     isCheck: false,
     json: Array<DataJSON>(), // asyncDataで読み込んだJSON
+    totalCount: 0, // トータル感染者数
   }),
   watch: {
     // Swtich変更を検知
