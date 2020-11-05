@@ -65,6 +65,11 @@ export default Vue.extend({
         title: "全範囲グラフ",
         icon: "mdi-chart-bar",
         path: "/allchart",
+      },
+      {
+                title: "月ごとのグラフ",
+        icon: "mdi-chart-bar",
+        path: "/monthchart",
       }
     ),
   }),
