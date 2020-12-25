@@ -73,7 +73,7 @@ export default Vue.extend({
       const calendar = moment()
         .month(month - 1)
         .date(1);
-      return calendar.format("/YYYY/MM")
+      return calendar.format("/YYYY/M")
     },
   },
 });

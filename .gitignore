@@ -93,3 +93,6 @@ sw.*
 /content/covid19.csv
 /content/data.json
 /content/month_menu.json
+
+# Local Netlify folder
+.netlify

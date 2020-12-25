@@ -148,7 +148,6 @@ const request = https.get(options, (res) => {
     })
     res.on("end", () => {
         // 取得完了。保存する
-        // CSVファイルはnuxt/contentモジュールで使えるようになる
         fs.writeFile('content/covid19.csv', response, { encoding: "utf-8" }, (err) => {
             // 終了したらJSON保存
             csvFileToMenuJSON()

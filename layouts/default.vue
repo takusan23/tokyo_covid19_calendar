@@ -1,15 +1,30 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" :clipped="clipped" fixed app>
+    <v-navigation-drawer
+      v-model="drawer"
+      :mini-variant="miniVariant"
+      :clipped="clipped"
+      fixed
+      app
+    >
       <v-list nav>
         <!-- ダークモードスイッチ -->
         <v-switch
           class="text-center ma-2 pa-2"
-          :append-icon="`${$vuetify.theme.dark ? 'mdi-weather-night' : 'mdi-weather-sunny'}`"
+          :append-icon="`${
+            $vuetify.theme.dark ? 'mdi-weather-night' : 'mdi-weather-sunny'
+          }`"
           v-model="$vuetify.theme.dark"
           label="テーマ切り替え"
         ></v-switch>
-        <v-list-item v-for="(item, i) in items" :key="i" :to="item.path" nuxt router exact>
+        <v-list-item
+          v-for="(item, i) in items"
+          :key="i"
+          :to="item.path"
+          nuxt
+          router
+          exact
+        >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -21,7 +36,10 @@
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app color="blue">
       <v-app-bar-nav-icon class="white--text" @click.stop="drawer = !drawer" />
-      <v-toolbar-title class="white--text" v-text="this.$store.state.barTitle" />
+      <v-toolbar-title
+        class="white--text"
+        v-text="this.$store.state.barTitle"
+      />
       <v-spacer />
     </v-app-bar>
     <v-main>
@@ -67,7 +85,7 @@ export default Vue.extend({
         path: "/allchart",
       },
       {
-                title: "月ごとのグラフ",
+        title: "月ごとのグラフ",
         icon: "mdi-chart-bar",
         path: "/monthchart",
       }
