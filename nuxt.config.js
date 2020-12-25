@@ -1,5 +1,8 @@
 import colors from 'vuetify/es5/util/colors'
 
+// data.json読み込むのに使う
+const fs = require("fs").promises
+
 export default {
   /*
   ** Nuxt rendering mode
@@ -16,12 +19,12 @@ export default {
   ** See https://nuxtjs.org/api/configuration-head
   */
   head: {
-    titleTemplate: '%s - ' + process.env.npm_package_name,
+    titleTemplate: '%s - ' + '東京コロナカレンダー',
     title: process.env.npm_package_name || '',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
+      { hid: 'description', name: 'description', content: '東京都のコロナウイルス感染者をカレンダーに表示する非公式サイトです。' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -50,6 +53,7 @@ export default {
   buildModules: [
     '@nuxt/typescript-build',
     '@nuxtjs/vuetify',
+    '@nuxtjs/google-analytics',
   ],
   /*
   ** Nuxt.js modules
@@ -58,6 +62,7 @@ export default {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt/content
     '@nuxt/content',
+    '@nuxtjs/sitemap',
   ],
   /*
   ** Content module configuration
@@ -112,4 +117,24 @@ export default {
       }
     ]
   },
+  /**
+ * サイトマップ書き出し
+ */
+  sitemap: {
+    hostname: 'https://tokyo-covid19-calendar.netlify.app/',
+    routes: async () => {
+      // 月一覧読み出し
+      const dataJSON = await fs.readFile('./content/month_menu.json', 'utf-8')
+      // 日付だけの配列へ
+      return Array.from(JSON.parse(dataJSON))
+    }
+  },
+  /** 
+   * Google アナリティクス
+   * 
+   * ユニバーサル アナリティクス プロパティのスイッチをONにしないと、従来のUA-から始まるIDが生成されない。
+   */
+  googleAnalytics: {
+    id: 'UA-149954537-3'
+  }
 }

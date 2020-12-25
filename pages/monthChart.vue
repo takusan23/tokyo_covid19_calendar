@@ -22,7 +22,7 @@ export default Vue.extend({
         jsonList.push(json);
       }
     });
-    
+
     // グラフにわたすデータ
     const chartData = new Map<String, number>();
     jsonList.forEach((json) => {
@@ -42,10 +42,23 @@ export default Vue.extend({
   },
   data: () => ({
     chartData: new Map<string, number>(),
+    title: "月ごとのグラフ",
   }),
+  head() {
+    const title = this.title;
+    const url = `https://tokyo-covid19-calendar.netlify.app${this.$route.path}/`;
+    return {
+      title: title,
+      meta: [
+        { hid: "og:url", property: "og:url", content: url },
+        { hid: "og:title", property: "og:title", content: title },
+      ],
+    };
+  },
+
   mounted() {
     // タイトル変更
-    this.$store.commit("setBarTitle", `月ごとのグラフ`);
+    this.$store.commit("setBarTitle", this.title);
     this.chartData = new Map(this.chartData);
   },
 });

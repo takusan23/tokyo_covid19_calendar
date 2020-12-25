@@ -18,7 +18,6 @@ https://tokyo-covid19-calendar.netlify.app/
     - `as any`しまくっているのでどうにかしたい。
 - Nuxt.js
     - 静的サイト書き出しが付いたVue.js
-    - nuxt/contentでCSVデータを読み込んでる
 - Vuetify
     - カレンダー、メニューなどのUI
 - Chart.js
@@ -28,6 +27,11 @@ https://tokyo-covid19-calendar.netlify.app/
     - 指定した日の週の日曜日、土曜日の日付を取得するのに使った。
 - Koruriフォント
     - https://koruri.github.io/
+- Googleアナリティクス
+    - 来訪者数など
+- Google Search Console
+    - サイトマップの送信など
+    - Netlifyのsnippet injectionってやつで必要なmetaタグを差し込んでます。
 
 # 仕組み
 
@@ -77,6 +81,21 @@ npm run dev
 ```
 npm run dev
 ```
+
+## 静的()サイト書き出し
+Nuxt.jsなのでHTMLファイルに書き出すことができます。
+
+```
+npm run generate
+```
+
+### 静的サイト書き出し確認
+静的サイトの書き出し結果を確認することができます(Nuxt.jsの機能)
+
+```
+npx nuxt serve
+```
+
 
 # ファイル構成
 - assets

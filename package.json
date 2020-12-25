@@ -13,6 +13,7 @@
     "@nuxt/content": "^1.6.1",
     "@nuxt/typescript-runtime": "^1.0.0",
     "@nuxtjs/pwa": "^3.0.0-beta.20",
+    "@nuxtjs/sitemap": "^2.4.0",
     "@types/chart.js": "^2.9.24",
     "chart.js": "^2.9.3",
     "moment": "^2.27.0",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@nuxt/types": "^2.14.0",
     "@nuxt/typescript-build": "^2.0.2",
+    "@nuxtjs/google-analytics": "^2.4.0",
     "@nuxtjs/vuetify": "^1.11.2"
   }
 }

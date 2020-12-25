@@ -4,13 +4,19 @@
       <v-col v-for="col in 12" :key="col">
         <v-card class="ma-2 pa-2" elevation="10">
           <!-- たいとる -->
-          <v-toolbar dense elevation="0" style="background-color:transparent">
+          <v-toolbar dense elevation="0" style="background-color: transparent">
             <v-toolbar-title>{{ col }} 月</v-toolbar-title>
             <v-spacer></v-spacer>
             <!-- 詳細へボタン -->
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <v-btn icon v-bind="attrs" v-on="on" link :to="openCalendar(col)">
+                <v-btn
+                  icon
+                  v-bind="attrs"
+                  v-on="on"
+                  link
+                  :to="openCalendar(col)"
+                >
                   <v-icon>mdi-open-in-new</v-icon>
                 </v-btn>
               </template>
@@ -18,7 +24,10 @@
             </v-tooltip>
           </v-toolbar>
           <!-- カレンダー -->
-          <Calendar :event-data="eventData" :calendar-start="getCalendarStart(col)" />
+          <Calendar
+            :event-data="eventData"
+            :calendar-start="getCalendarStart(col)"
+          />
         </v-card>
       </v-col>
     </v-row>
@@ -51,9 +60,22 @@ export default Vue.extend({
 
     return { eventData: eventsList };
   },
-  data: () => ({}),
+  data: () => ({
+    title: "トップ",
+  }),
   mounted() {
-    this.$store.commit("setBarTitle", `トップ`);
+    this.$store.commit("setBarTitle", this.title);
+  },
+  head() {
+    const title = this.title;
+    const url = `https://tokyo-covid19-calendar.netlify.app${this.$route.path}/`;
+    return {
+      title: title,
+      meta: [
+        { hid: "og:url", property: "og:url", content: url },
+        { hid: "og:title", property: "og:title", content: title },
+      ],
+    };
   },
   methods: {
     /**
@@ -73,7 +95,7 @@ export default Vue.extend({
       const calendar = moment()
         .month(month - 1)
         .date(1);
-      return calendar.format("/YYYY/M")
+      return calendar.format("/YYYY/M");
     },
   },
 });

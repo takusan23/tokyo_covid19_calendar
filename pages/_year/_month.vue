@@ -77,6 +77,17 @@ export default Vue.extend({
     json: Array<DataJSON>(), // asyncDataで読み込んだJSON
     totalCount: 0, // トータル感染者数
   }),
+  head() {
+    const title = this.formatStartTime;
+    const url = `https://tokyo-covid19-calendar.netlify.app${this.$route.path}/`;
+    return {
+      title: title,
+      meta: [
+        { hid: "og:url", property: "og:url", content: url },
+        { hid: "og:title", property: "og:title", content: title },
+      ],
+    };
+  },
   watch: {
     // Swtich変更を検知
     isCheck: function () {

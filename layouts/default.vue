@@ -88,17 +88,23 @@ export default Vue.extend({
         title: "月ごとのグラフ",
         icon: "mdi-chart-bar",
         path: "/monthchart",
+      },
+      {
+        title: "このサイトについて",
+        icon: "mdi-information-outline",
+        path: "/about",
       }
     ),
   }),
   created() {
-    menuJSON.forEach((menu) => {
-      const menuObj = {
+    menuJSON.reverse().forEach((menu) => {
+      const menuObj: MenuObject = {
         title: menu,
         icon: "mdi-calendar",
         path: `/${menu}`,
       };
-      this.items.push(menuObj);
+      // このサイトについて を一番下に持っていきたいのでちょっと修正
+      this.items.splice(3, 0, menuObj);
     });
   },
 });
