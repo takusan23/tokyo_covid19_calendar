@@ -2,9 +2,9 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a4791628-eec0-426a-b8ba-b0bb4da09cd3/deploy-status)](https://app.netlify.com/sites/tokyo-covid19-calendar/deploys)
 
-カレンダーに感染者数を載せて見てみたいということで作ってみました。適当すぎる
+カレンダーに感染者数を載せて見てみたいということで作ってみました
 
-![Imgur](https://imgur.com/zYyQyE6.png)
+![Imgur](https://imgur.com/iesWwnH.png)
 
 週間ごとの人数やばくね？
 
@@ -42,9 +42,12 @@ https://tokyo-covid19-calendar.netlify.app/
     - `pages/_year/_month.vue`参照
 
 ## GitHub Actions
-を利用して、NetlifyのWebHookを毎日朝九時に送るようにしてます（多分）
+を利用して、NetlifyのWebHookを日付が変わったら送るようにしてます（多分）
 
 GitHub Actionsについては自作ブログでちょっと書いた：https://takusan.negitoro.dev/posts/github_actions
+
+# データ更新
+日付が変わったら
 
 # 実行方法
 
