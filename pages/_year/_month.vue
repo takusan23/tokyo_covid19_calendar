@@ -54,13 +54,16 @@ export default Vue.extend({
       const month = parseInt(paramMonth);
       const year = parseInt(paramYear);
       // その月のユーザーを数える
-      totalCount = jsonList
-        .filter((data) => {
-          const calendar = moment(data.date);
-          return calendar.month() === month - 1 && calendar.year() === year;
-        })
-        .map((data) => data.count.total) // 人数のみ
-        .reduce((a, b) => a + b); // 合計を足す
+      const monthList = jsonList.filter((data) => {
+        const calendar = moment(data.date);
+        return calendar.month() === month - 1 && calendar.year() === year;
+      });
+      // 空じゃなければ計算
+      if (monthList.length > 0) {
+        totalCount = monthList
+          .map((data) => data.count.total) // 人数のみ
+          .reduce((a, b) => a + b); // 合計を足す
+      }
     }
 
     return { events: eventsList, json: jsonList, totalCount: totalCount };
@@ -110,9 +113,15 @@ export default Vue.extend({
     ) as EventObject[];
     dateOnlyList.forEach((json) => {
       const month = this.$route.params.month;
+      const year = this.$route.params.year;
       const calendar = moment(json.start);
-      const setCalendar = moment().set("month", parseInt(month) - 1);
-      if (calendar.month() == setCalendar.month()) {
+      const setCalendar = moment()
+        .set("month", parseInt(month) - 1)
+        .set("year", parseInt(year));
+      if (
+        calendar.month() == setCalendar.month() &&
+        calendar.year() == setCalendar.year()
+      ) {
         // 同じ月
         this.chartData.set(json.start, json.count);
       }
@@ -133,10 +142,7 @@ export default Vue.extend({
         this.start = `${year}-${month}-00`;
         this.formatStartTime = `${year}年${month}月`;
         this.month = month - 1;
-        this.$store.commit(
-          "setBarTitle",
-          `${this.formatStartTime}のコロナカレンダー`
-        );
+        this.$store.commit("setBarTitle", `${this.formatStartTime}のコロナカレンダー`);
       }
     },
   },

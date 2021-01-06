@@ -1,5 +1,5 @@
 /**
- * 型定義読み込む
+ * かた
  */
 import { EventObject, DataJSON } from "@/ts/ObjectType.ts";
 

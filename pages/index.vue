@@ -1,5 +1,10 @@
 <template>
   <v-container>
+
+    <v-card class="ma-1 pa-1" color="primary">
+      <v-card-title class="white--text">2020年</v-card-title>
+    </v-card>
+
     <v-row>
       <v-col v-for="col in 12" :key="col">
         <v-card class="ma-2 pa-2" elevation="10">
@@ -10,13 +15,7 @@
             <!-- 詳細へボタン -->
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  v-bind="attrs"
-                  v-on="on"
-                  link
-                  :to="openCalendar(col)"
-                >
+                <v-btn icon v-bind="attrs" v-on="on" link :to="openCalendar(col)">
                   <v-icon>mdi-open-in-new</v-icon>
                 </v-btn>
               </template>
@@ -26,7 +25,37 @@
           <!-- カレンダー -->
           <Calendar
             :event-data="eventData"
-            :calendar-start="getCalendarStart(col)"
+            :calendar-start="getCalendarStart(2020, col)"
+          />
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-card class="ma-1 pa-1" color="primary">
+      <v-card-title class="white--text">2021年</v-card-title>
+    </v-card>
+
+    <v-row>
+      <v-col v-for="col in 12" :key="col">
+        <v-card class="ma-2 pa-2" elevation="10">
+          <!-- たいとる -->
+          <v-toolbar dense elevation="0" style="background-color: transparent">
+            <v-toolbar-title>{{ col }} 月</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <!-- 詳細へボタン -->
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on" link :to="openCalendar(col)">
+                  <v-icon>mdi-open-in-new</v-icon>
+                </v-btn>
+              </template>
+              <span>詳細へ</span>
+            </v-tooltip>
+          </v-toolbar>
+          <!-- カレンダー -->
+          <Calendar
+            :event-data="eventData"
+            :calendar-start="getCalendarStart(2021, col)"
           />
         </v-card>
       </v-col>
@@ -80,10 +109,12 @@ export default Vue.extend({
   methods: {
     /**
      * YYYY-MM-DD を生成する
+     * @param year 2020とか2021とか
      * @param month 1月なら1
      */
-    getCalendarStart(month: number) {
+    getCalendarStart(year: number, month: number) {
       const calendar = moment()
+        .year(year)
         .month(month - 1)
         .date(1);
       return calendar.format("YYYY-MM-DD");
